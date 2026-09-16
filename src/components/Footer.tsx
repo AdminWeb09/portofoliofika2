@@ -1,12 +1,14 @@
 import React from 'react';
-import { ArrowUp, Sparkles, Heart, Github, Linkedin, Instagram, Mail } from 'lucide-react';
-import { personalInfo, navItems, socialLinks } from '../data/portfolioData.ts';
+import { ArrowUp, Sparkles, Heart, Github, Linkedin, Instagram, Mail, Lock } from 'lucide-react';
+import { navItems, socialLinks } from '../data/portfolioData.ts';
+import { usePortfolio } from '../context/PortfolioContext.tsx';
 
 interface FooterProps {
   isDark: boolean;
 }
 
 export const Footer: React.FC<FooterProps> = ({ isDark }) => {
+  const { personalInfo } = usePortfolio();
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -112,6 +114,18 @@ export const Footer: React.FC<FooterProps> = ({ isDark }) => {
                   </a>
                 </li>
               ))}
+              <li>
+                <a
+                  id="footer-nav-admin"
+                  href="#admin"
+                  className={`inline-flex items-center gap-1 font-medium transition-colors hover:underline underline-offset-4 ${
+                    isDark ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-500'
+                  }`}
+                >
+                  <Lock className="w-3 h-3" />
+                  <span>Panel Admin</span>
+                </a>
+              </li>
             </ul>
           </div>
 

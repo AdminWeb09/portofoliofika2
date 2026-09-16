@@ -1,13 +1,15 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Code2, Smartphone, Palette, Zap, CheckCircle2, User, Award, Terminal } from 'lucide-react';
-import { personalInfo, stats, experienceHighlights } from '../data/portfolioData.ts';
+import { stats, experienceHighlights } from '../data/portfolioData.ts';
+import { usePortfolio } from '../context/PortfolioContext.tsx';
 
 interface AboutProps {
   isDark: boolean;
 }
 
 export const About: React.FC<AboutProps> = ({ isDark }) => {
+  const { personalInfo } = usePortfolio();
   const getIcon = (iconName: string) => {
     switch (iconName) {
       case 'Code2':

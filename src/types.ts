@@ -47,9 +47,33 @@ export interface NavItem {
   href: string;
 }
 
+export interface PersonalInfo {
+  name: string;
+  role: string;
+  tagline: string;
+  bioShort: string;
+  bioLong: string;
+  location: string;
+  email: string;
+  availability: string;
+  yearsOfExperience: string;
+  cvUrl: string;
+}
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  createdAt: string;
+  read: boolean;
+}
+
 export interface ContactFormData {
   name: string;
   email: string;
   subject: string;
   message: string;
 }
+

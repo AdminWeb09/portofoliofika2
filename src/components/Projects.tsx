@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ExternalLink, Github, FolderGit2, ArrowUpRight, Info } from 'lucide-react';
-import { projects } from '../data/portfolioData.ts';
+import { usePortfolio } from '../context/PortfolioContext.tsx';
 import { Project } from '../types.ts';
 import { ProjectModal } from './ProjectModal.tsx';
 
@@ -10,6 +10,7 @@ interface ProjectsProps {
 }
 
 export const Projects: React.FC<ProjectsProps> = ({ isDark }) => {
+  const { projects } = usePortfolio();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [activeModalProject, setActiveModalProject] = useState<Project | null>(null);
 

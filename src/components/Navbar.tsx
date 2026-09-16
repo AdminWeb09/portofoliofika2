@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Sparkles, Send } from 'lucide-react';
-import { navItems, personalInfo } from '../data/portfolioData.ts';
+import { Menu, X, Sparkles, Send, ShieldCheck, Lock } from 'lucide-react';
+import { navItems } from '../data/portfolioData.ts';
+import { usePortfolio } from '../context/PortfolioContext.tsx';
 import { ThemeToggle } from './ThemeToggle.tsx';
 
 interface NavbarProps {
   isDark: boolean;
   onToggleTheme: () => void;
+  onOpenAdmin: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ isDark, onToggleTheme }) => {
+export const Navbar: React.FC<NavbarProps> = ({ isDark, onToggleTheme, onOpenAdmin }) => {
+  const { personalInfo, isAdminLoggedIn } = usePortfolio();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
@@ -126,9 +129,34 @@ export const Navbar: React.FC<NavbarProps> = ({ isDark, onToggleTheme }) => {
             })}
           </nav>
 
-          {/* Right Action: Theme Switcher & Contact CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Right Action: Theme Switcher, Admin Button & Contact CTA */}
+          <div className="hidden md:flex items-center gap-2.5">
             <ThemeToggle isDark={isDark} onToggle={onToggleTheme} />
+
+            {/* Admin Panel Button */}
+            <button
+              id="navbar-admin-btn"
+              onClick={onOpenAdmin}
+              type="button"
+              title="Panel Admin Portofolio"
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+                isAdminLoggedIn
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+                  : isDark
+                  ? 'bg-slate-800/80 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700'
+                  : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
+              }`}
+            >
+              {isAdminLoggedIn ? (
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              ) : (
+                <Lock className="w-3.5 h-3.5 text-indigo-400" />
+              )}
+              <span>Admin</span>
+              {isAdminLoggedIn && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              )}
+            </button>
 
             <a
               id="navbar-contact-cta"
@@ -199,7 +227,30 @@ export const Navbar: React.FC<NavbarProps> = ({ isDark, onToggleTheme }) => {
                 );
               })}
 
-              <div className="pt-2 border-t border-slate-700/40">
+              <div className="pt-2 border-t border-slate-700/40 space-y-2">
+                <button
+                  id="mobile-admin-btn"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenAdmin();
+                  }}
+                  type="button"
+                  className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold border transition-colors cursor-pointer ${
+                    isAdminLoggedIn
+                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                      : isDark
+                      ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
+                      : 'bg-slate-100 border-slate-300 text-slate-800 hover:bg-slate-200'
+                  }`}
+                >
+                  {isAdminLoggedIn ? (
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  ) : (
+                    <Lock className="w-4 h-4 text-indigo-400" />
+                  )}
+                  <span>Panel Admin {isAdminLoggedIn && '(Aktif)'}</span>
+                </button>
+
                 <a
                   id="mobile-contact-cta"
                   href="#contact"

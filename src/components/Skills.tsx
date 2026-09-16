@@ -19,13 +19,14 @@ import {
   Activity,
   Cpu,
 } from 'lucide-react';
-import { skills } from '../data/portfolioData.ts';
+import { usePortfolio } from '../context/PortfolioContext.tsx';
 
 interface SkillsProps {
   isDark: boolean;
 }
 
 export const Skills: React.FC<SkillsProps> = ({ isDark }) => {
+  const { skills } = usePortfolio();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const categories = [

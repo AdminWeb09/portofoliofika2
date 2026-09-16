@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { PortfolioProvider } from './context/PortfolioContext.tsx';
 import { Navbar } from './components/Navbar.tsx';
 import { Hero } from './components/Hero.tsx';
 import { About } from './components/About.tsx';
@@ -11,8 +12,16 @@ import { Skills } from './components/Skills.tsx';
 import { Projects } from './components/Projects.tsx';
 import { Contact } from './components/Contact.tsx';
 import { Footer } from './components/Footer.tsx';
+import { AdminPanel } from './components/admin/AdminPanel.tsx';
 
-export default function App() {
+function PortfolioApp() {
+  const [currentView, setCurrentView] = useState<'portfolio' | 'admin'>(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#admin') {
+      return 'admin';
+    }
+    return 'portfolio';
+  });
+
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('portfolio-theme');
@@ -31,9 +40,41 @@ export default function App() {
     }
   }, [isDark]);
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#admin') {
+        setCurrentView('admin');
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   const toggleTheme = () => {
     setIsDark((prev) => !prev);
   };
+
+  const handleOpenAdmin = () => {
+    window.location.hash = '#admin';
+    setCurrentView('admin');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBackToSite = () => {
+    window.history.replaceState(null, '', window.location.pathname);
+    setCurrentView('portfolio');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  if (currentView === 'admin') {
+    return (
+      <AdminPanel
+        onBackToSite={handleBackToSite}
+        isDark={isDark}
+        toggleTheme={toggleTheme}
+      />
+    );
+  }
 
   return (
     <div
@@ -42,7 +83,11 @@ export default function App() {
       }`}
     >
       {/* Navigation Header */}
-      <Navbar isDark={isDark} onToggleTheme={toggleTheme} />
+      <Navbar
+        isDark={isDark}
+        onToggleTheme={toggleTheme}
+        onOpenAdmin={handleOpenAdmin}
+      />
 
       {/* Main Content Sections */}
       <main className="flex flex-col">
@@ -67,4 +112,13 @@ export default function App() {
     </div>
   );
 }
+
+export default function App() {
+  return (
+    <PortfolioProvider>
+      <PortfolioApp />
+    </PortfolioProvider>
+  );
+}
+
 

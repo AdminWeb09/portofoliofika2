@@ -13,7 +13,8 @@ import {
   MessageSquare,
   Sparkles,
 } from 'lucide-react';
-import { personalInfo, socialLinks } from '../data/portfolioData.ts';
+import { socialLinks } from '../data/portfolioData.ts';
+import { usePortfolio } from '../context/PortfolioContext.tsx';
 import { ContactFormData } from '../types.ts';
 
 interface ContactProps {
@@ -21,6 +22,7 @@ interface ContactProps {
 }
 
 export const Contact: React.FC<ContactProps> = ({ isDark }) => {
+  const { personalInfo, addMessage } = usePortfolio();
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
@@ -70,6 +72,14 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
 
     setIsSubmitting(true);
 
+    // Save message to context & storage
+    addMessage({
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      subject: formData.subject.trim(),
+      message: formData.message.trim(),
+    });
+
     // Simulate reliable form submission delay
     setTimeout(() => {
       setIsSubmitting(false);
@@ -81,7 +91,7 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
         message: '',
       });
       setErrors({});
-    }, 1200);
+    }, 900);
   };
 
   const handleChange = (

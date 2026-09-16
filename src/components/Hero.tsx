@@ -1,13 +1,15 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Send, Download, Github, Linkedin, Instagram, Mail, Sparkles, Code2, Layers, ChevronDown } from 'lucide-react';
-import { personalInfo, socialLinks } from '../data/portfolioData.ts';
+import { socialLinks } from '../data/portfolioData.ts';
+import { usePortfolio } from '../context/PortfolioContext.tsx';
 
 interface HeroProps {
   isDark: boolean;
 }
 
 export const Hero: React.FC<HeroProps> = ({ isDark }) => {
+  const { personalInfo } = usePortfolio();
   const handleScrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
