@@ -11,6 +11,9 @@ import {
   FileJson,
   Shield,
   Save,
+  Flame,
+  Database,
+  RefreshCw,
 } from 'lucide-react';
 import { usePortfolio } from '../../context/PortfolioContext.tsx';
 
@@ -19,7 +22,19 @@ interface AdminSettingsProps {
 }
 
 export const AdminSettings: React.FC<AdminSettingsProps> = ({ isDark }) => {
-  const { changePassword, exportData, importData, resetToDefaults } = usePortfolio();
+  const {
+    changePassword,
+    exportData,
+    importData,
+    resetToDefaults,
+    firebaseUser,
+    isFirebaseConnected,
+    isFirebaseSyncing,
+    syncToFirebase,
+  } = usePortfolio();
+
+  // Firebase sync state
+  const [firebaseSyncStatus, setFirebaseSyncStatus] = useState<{ success?: boolean; msg?: string } | null>(null);
 
   // Password change state
   const [oldPassword, setOldPassword] = useState('');
@@ -114,6 +129,88 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ isDark }) => {
           <span>Semua data portofolio berhasil di-reset ke kondisi awal (default).</span>
         </div>
       )}
+
+      {/* 0. Integrasi Firebase Cloud Firestore */}
+      <div className={`p-6 sm:p-8 rounded-3xl border ${
+        isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+      }`}>
+        <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-500">
+              <Flame className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Integrasi Firebase Cloud Database & Auth
+                </h3>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${
+                  isFirebaseConnected
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                    : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                }`}>
+                  {isFirebaseConnected ? 'Terhubung (Online)' : 'Menghubungkan...'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">
+                Penyimpanan data cloud real-time Firestore dan keamanan autentikasi Google Firebase.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={async () => {
+              setFirebaseSyncStatus(null);
+              const res = await syncToFirebase();
+              if (res.success) {
+                setFirebaseSyncStatus({ success: true, msg: 'Semua proyek, skill, dan profil berhasil diunggah ke Firebase Firestore!' });
+              } else {
+                setFirebaseSyncStatus({ success: false, msg: res.error });
+              }
+            }}
+            disabled={isFirebaseSyncing}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 transition-all cursor-pointer shadow-md shadow-indigo-600/20"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isFirebaseSyncing ? 'animate-spin' : ''}`} />
+            <span>{isFirebaseSyncing ? 'Menyinkronkan...' : 'Inisialisasi / Sinkronkan Data ke Firestore'}</span>
+          </button>
+        </div>
+
+        {firebaseSyncStatus && (
+          <div className={`mb-4 p-3 rounded-xl border text-xs flex items-center gap-2 ${
+            firebaseSyncStatus.success
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+              : 'bg-red-500/10 border-red-500/30 text-red-400'
+          }`}>
+            {firebaseSyncStatus.success ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertTriangle className="w-4 h-4 shrink-0" />}
+            <span>{firebaseSyncStatus.msg}</span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div className={`p-3.5 rounded-xl border ${
+            isDark ? 'bg-slate-950/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
+          }`}>
+            <span className="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider font-semibold">Firebase Project ID</span>
+            <span className="font-mono font-bold text-indigo-400 break-all">plenary-modem-00w9t</span>
+          </div>
+          <div className={`p-3.5 rounded-xl border ${
+            isDark ? 'bg-slate-950/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
+          }`}>
+            <span className="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider font-semibold">Status Auth Admin</span>
+            <span className="font-semibold text-emerald-400">
+              {firebaseUser ? `${firebaseUser.email} (Google Auth)` : 'Admin Terverifikasi (Lokal & Cloud)'}
+            </span>
+          </div>
+          <div className={`p-3.5 rounded-xl border ${
+            isDark ? 'bg-slate-950/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
+          }`}>
+            <span className="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider font-semibold">Penyimpanan Firestore</span>
+            <span className="font-semibold text-cyan-400">Multi-Collection (Projects, Skills, Profile, Messages)</span>
+          </div>
+        </div>
+      </div>
 
       {/* 1. Ganti Password */}
       <div className={`p-6 sm:p-8 rounded-3xl border ${

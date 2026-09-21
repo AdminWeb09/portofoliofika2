@@ -16,6 +16,9 @@ import {
   ShieldCheck,
   Sun,
   Moon,
+  Flame,
+  RefreshCw,
+  CheckCircle2,
 } from 'lucide-react';
 import { usePortfolio } from '../../context/PortfolioContext.tsx';
 import { AdminProjects } from './AdminProjects.tsx';
@@ -37,8 +40,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   isDark,
   toggleTheme,
 }) => {
-  const { logout, projects, skills, messages, unreadCount, personalInfo } = usePortfolio();
+  const {
+    logout,
+    projects,
+    skills,
+    messages,
+    unreadCount,
+    personalInfo,
+    firebaseUser,
+    isFirebaseConnected,
+    isFirebaseSyncing,
+    syncToFirebase,
+  } = usePortfolio();
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+
+  const handleManualSync = async () => {
+    setSyncMessage(null);
+    const res = await syncToFirebase();
+    if (res.success) {
+      setSyncMessage('Data berhasil disinkronkan ke Firebase Firestore!');
+      setTimeout(() => setSyncMessage(null), 4000);
+    } else {
+      setSyncMessage(`Gagal sinkron: ${res.error}`);
+    }
+  };
 
   const navTabs = [
     { key: 'overview', label: 'Ringkasan', icon: LayoutDashboard },
@@ -172,6 +198,51 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <main className="flex-1 min-w-0">
           {activeTab === 'overview' && (
             <div className="space-y-6">
+              {/* Firebase Cloud Sync Banner */}
+              <div className={`p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                isDark ? 'bg-indigo-950/30 border-indigo-500/30' : 'bg-indigo-50 border-indigo-200'
+              }`}>
+                <div className="flex items-start sm:items-center gap-3">
+                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 shrink-0">
+                    <Flame className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xs sm:text-sm font-bold">Database: Firebase Firestore Cloud</h3>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">
+                        Real-time Sync
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      {firebaseUser ? (
+                        <span>Login via Google: <strong className="text-indigo-400">{firebaseUser.email}</strong></span>
+                      ) : (
+                        <span>Perubahan data proyek, keahlian, dan profil otomatis tersinkronisasi ke Firebase.</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleManualSync}
+                    disabled={isFirebaseSyncing}
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 transition-all cursor-pointer shadow-sm shadow-indigo-600/30"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isFirebaseSyncing ? 'animate-spin' : ''}`} />
+                    <span>{isFirebaseSyncing ? 'Menyinkronkan...' : 'Sinkronkan ke Firestore'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {syncMessage && (
+                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>{syncMessage}</span>
+                </div>
+              )}
+
               <div>
                 <h2 className={`text-xl sm:text-2xl font-bold tracking-tight ${
                   isDark ? 'text-white' : 'text-slate-900'

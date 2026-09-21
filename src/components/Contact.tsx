@@ -66,23 +66,21 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
 
-    // Save message to context & storage
-    addMessage({
-      name: formData.name.trim(),
-      email: formData.email.trim(),
-      subject: formData.subject.trim(),
-      message: formData.message.trim(),
-    });
+    try {
+      // Save message to context & Firebase Firestore
+      await addMessage({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+      });
 
-    // Simulate reliable form submission delay
-    setTimeout(() => {
-      setIsSubmitting(false);
       setIsSubmitted(true);
       setFormData({
         name: '',
@@ -91,7 +89,11 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
         message: '',
       });
       setErrors({});
-    }, 900);
+    } catch (err) {
+      console.error('Error sending message:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (

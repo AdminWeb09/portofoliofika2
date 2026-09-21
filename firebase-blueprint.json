@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "Portofolio showcase project entry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "maxLength": 150 },
+        "subtitle": { "type": "string", "maxLength": 200 },
+        "category": { "type": "string", "enum": ["Web App", "E-Commerce", "Dashboard", "Landing Page"] },
+        "description": { "type": "string", "maxLength": 500 },
+        "fullDescription": { "type": "string", "maxLength": 3000 },
+        "features": { "type": "array", "description": "Key features list" },
+        "tags": { "type": "array", "description": "Technology tags" },
+        "image": { "type": "string", "maxLength": 1000 },
+        "liveUrl": { "type": "string", "maxLength": 500 },
+        "githubUrl": { "type": "string", "maxLength": 500 },
+        "featured": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["title", "category", "description", "image"]
+    },
+    "Skill": {
+      "title": "Skill",
+      "description": "Technical or design skill item",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "enum": ["frontend", "backend", "tools", "design"] },
+        "icon": { "type": "string", "maxLength": 50 },
+        "level": { "type": "number" },
+        "experience": { "type": "string", "maxLength": 50 },
+        "tagline": { "type": "string", "maxLength": 200 }
+      },
+      "required": ["name", "category", "level"]
+    },
+    "Profile": {
+      "title": "Profile",
+      "description": "Personal biography and contact metadata",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "maxLength": 150 },
+        "tagline": { "type": "string", "maxLength": 300 },
+        "bioShort": { "type": "string", "maxLength": 600 },
+        "bioLong": { "type": "string", "maxLength": 3000 },
+        "location": { "type": "string", "maxLength": 150 },
+        "email": { "type": "string", "maxLength": 150 },
+        "availability": { "type": "string", "maxLength": 100 },
+        "yearsOfExperience": { "type": "string", "maxLength": 50 },
+        "cvUrl": { "type": "string", "maxLength": 500 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["name", "role", "email"]
+    },
+    "ContactMessage": {
+      "title": "ContactMessage",
+      "description": "Inquiry submitted by a portfolio visitor",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "subject": { "type": "string", "maxLength": 200 },
+        "message": { "type": "string", "maxLength": 3000 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "read": { "type": "boolean" }
+      },
+      "required": ["name", "email", "subject", "message", "read"]
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Showcase projects collection"
+    },
+    "/skills/{skillId}": {
+      "schema": "Skill",
+      "description": "Technical skills collection"
+    },
+    "/profile/{profileId}": {
+      "schema": "Profile",
+      "description": "Portfolio owner profile information document"
+    },
+    "/messages/{messageId}": {
+      "schema": "ContactMessage",
+      "description": "Visitor contact inquiries collection"
+    }
+  }
+}

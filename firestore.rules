@@ -1,0 +1,124 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Deny Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common Security Helpers
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerified() && (
+        request.auth.token.email == 'dindafika686@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Entity Validation Helpers
+    function isValidProject(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 150
+        && data.category is string && data.category in ['Web App', 'E-Commerce', 'Dashboard', 'Landing Page']
+        && data.description is string && data.description.size() <= 500
+        && data.image is string && data.image.size() <= 1000
+        && (!('subtitle' in data) || (data.subtitle is string && data.subtitle.size() <= 200))
+        && (!('fullDescription' in data) || (data.fullDescription is string && data.fullDescription.size() <= 3000))
+        && (!('liveUrl' in data) || (data.liveUrl is string && data.liveUrl.size() <= 500))
+        && (!('githubUrl' in data) || (data.githubUrl is string && data.githubUrl.size() <= 500))
+        && (!('featured' in data) || data.featured is bool)
+        && (!('features' in data) || (data.features is list && data.features.size() <= 20))
+        && (!('tags' in data) || (data.tags is list && data.tags.size() <= 20));
+    }
+
+    function isValidSkill(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.category is string && data.category in ['frontend', 'backend', 'tools', 'design']
+        && data.level is number && data.level >= 0 && data.level <= 100
+        && (!('icon' in data) || (data.icon is string && data.icon.size() <= 50))
+        && (!('experience' in data) || (data.experience is string && data.experience.size() <= 50))
+        && (!('tagline' in data) || (data.tagline is string && data.tagline.size() <= 200));
+    }
+
+    function isValidProfile(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.role is string && data.role.size() > 0 && data.role.size() <= 150
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 150
+        && (!('tagline' in data) || (data.tagline is string && data.tagline.size() <= 300))
+        && (!('bioShort' in data) || (data.bioShort is string && data.bioShort.size() <= 600))
+        && (!('bioLong' in data) || (data.bioLong is string && data.bioLong.size() <= 3000))
+        && (!('location' in data) || (data.location is string && data.location.size() <= 150))
+        && (!('availability' in data) || (data.availability is string && data.availability.size() <= 100))
+        && (!('yearsOfExperience' in data) || (data.yearsOfExperience is string && data.yearsOfExperience.size() <= 50))
+        && (!('cvUrl' in data) || (data.cvUrl is string && data.cvUrl.size() <= 500));
+    }
+
+    function isValidMessage(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 150
+        && data.subject is string && data.subject.size() > 0 && data.subject.size() <= 200
+        && data.message is string && data.message.size() > 0 && data.message.size() <= 3000
+        && data.read is bool;
+    }
+
+    // Projects Collection: Public read, Admin write
+    match /projects/{projectId} {
+      allow get, list: if true;
+      allow create: if isValidId(projectId) && isAdmin() && isValidProject(incoming());
+      allow update: if isValidId(projectId) && isAdmin() && isValidProject(incoming());
+      allow delete: if isValidId(projectId) && isAdmin();
+    }
+
+    // Skills Collection: Public read, Admin write
+    match /skills/{skillId} {
+      allow get, list: if true;
+      allow create: if isValidId(skillId) && isAdmin() && isValidSkill(incoming());
+      allow update: if isValidId(skillId) && isAdmin() && isValidSkill(incoming());
+      allow delete: if isValidId(skillId) && isAdmin();
+    }
+
+    // Profile Document: Public read, Admin write
+    match /profile/{profileId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(profileId) && isAdmin() && isValidProfile(incoming());
+      allow delete: if isValidId(profileId) && isAdmin();
+    }
+
+    // Visitor Contact Messages: Public write (with read=false), Admin read/manage
+    match /messages/{messageId} {
+      allow create: if isValidId(messageId) && isValidMessage(incoming()) && incoming().read == false;
+      allow get, list: if isAdmin();
+      allow update: if isValidId(messageId) && isAdmin() && isValidMessage(incoming());
+      allow delete: if isValidId(messageId) && isAdmin();
+    }
+
+    // Admins Collection
+    match /admins/{uid} {
+      allow read, write: if isAdmin();
+    }
+
+    // Connection Health-Check
+    match /test/{docId} {
+      allow read: if true;
+    }
+  }
+}
