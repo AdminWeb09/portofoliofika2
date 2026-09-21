@@ -9,7 +9,7 @@ import {
   onSnapshot,
   getDocs,
 } from 'firebase/firestore';
-import { Project, Skill, PersonalInfo, ContactMessage } from '../types.ts';
+import { Project, Skill, PersonalInfo, ContactMessage, SocialLink } from '../types.ts';
 import {
   personalInfo as defaultPersonalInfo,
   projects as defaultProjects,
@@ -59,6 +59,8 @@ const initialSampleMessages: ContactMessage[] = [
 export interface PortfolioContextType {
   personalInfo: PersonalInfo;
   updatePersonalInfo: (info: PersonalInfo) => Promise<void>;
+  socialLinks: SocialLink[];
+  updateSocialLinks: (links: SocialLink[]) => Promise<void>;
   projects: Project[];
   addProject: (project: Omit<Project, 'id'>) => Promise<void>;
   updateProject: (id: string, project: Partial<Project>) => Promise<void>;
@@ -98,7 +100,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [personalInfo, setPersonalInfoState] = useState<PersonalInfo>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.PERSONAL_INFO);
-      return saved ? JSON.parse(saved) : defaultPersonalInfo;
+      return saved ? { ...defaultPersonalInfo, ...JSON.parse(saved) } : defaultPersonalInfo;
     } catch {
       return defaultPersonalInfo;
     }
@@ -244,8 +246,9 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data() as PersonalInfo;
-          setPersonalInfoState(data);
-          localStorage.setItem(STORAGE_KEYS.PERSONAL_INFO, JSON.stringify(data));
+          const merged = { ...defaultPersonalInfo, ...data };
+          setPersonalInfoState(merged);
+          localStorage.setItem(STORAGE_KEYS.PERSONAL_INFO, JSON.stringify(merged));
         }
       },
       (error) => {
@@ -568,11 +571,26 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
+  const socialLinks: SocialLink[] =
+    personalInfo.socialLinks && personalInfo.socialLinks.length > 0
+      ? personalInfo.socialLinks
+      : (defaultPersonalInfo.socialLinks || []);
+
+  const updateSocialLinks = async (newLinks: SocialLink[]) => {
+    const updated: PersonalInfo = {
+      ...personalInfo,
+      socialLinks: newLinks,
+    };
+    await updatePersonalInfo(updated);
+  };
+
   return (
     <PortfolioContext.Provider
       value={{
         personalInfo,
         updatePersonalInfo,
+        socialLinks,
+        updateSocialLinks,
         projects,
         addProject,
         updateProject,

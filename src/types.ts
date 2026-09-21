@@ -55,9 +55,18 @@ export interface PersonalInfo {
   bioLong: string;
   location: string;
   email: string;
+  phone?: string;
   availability: string;
   yearsOfExperience: string;
   cvUrl: string;
+  avatarUrl?: string;
+  aboutImageUrl?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  instagramUrl?: string;
+  whatsappUrl?: string;
+  websiteUrl?: string;
+  socialLinks?: SocialLink[];
 }
 
 export interface ContactMessage {

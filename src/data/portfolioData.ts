@@ -1,6 +1,6 @@
-import { Project, Skill, StatItem, ExperienceHighlight, SocialLink, NavItem } from '../types.ts';
+import { Project, Skill, StatItem, ExperienceHighlight, SocialLink, NavItem, PersonalInfo } from '../types.ts';
 
-export const personalInfo = {
+export const personalInfo: PersonalInfo = {
   name: 'Dinda Fika',
   role: 'Frontend Developer & UI/UX Enthusiast',
   tagline: 'Membangun pengalaman web yang modern, interaktif, dan performan tinggi.',
@@ -10,9 +10,49 @@ export const personalInfo = {
     'Dengan latar belakang kuat dalam ekosistem React, TypeScript, dan desain modern berbasis Tailwind CSS, saya memiliki hasrat untuk menerjemahkan ide kompleks menjadi produk digital yang intuitif. Saya percaya bahwa pengalaman web yang luar biasa lahir dari pertemuan antara estetika desain yang matang dan rekayasa perangkat lunak yang andal.',
   location: 'Jakarta, Indonesia',
   email: 'dindafika686@gmail.com',
+  phone: '+62 812-3456-7890',
   availability: 'Tersedia untuk proyek freelance & kesempatan kerja penuh waktu',
   yearsOfExperience: '3+',
-  cvUrl: '#',
+  cvUrl: 'https://drive.google.com',
+  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+  aboutImageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
+  githubUrl: 'https://github.com/dindafika',
+  linkedinUrl: 'https://linkedin.com/in/dindafika',
+  instagramUrl: 'https://instagram.com/dindafika.dev',
+  whatsappUrl: 'https://wa.me/6281234567890',
+  websiteUrl: 'https://dindafika.dev',
+  socialLinks: [
+    {
+      platform: 'GitHub',
+      url: 'https://github.com/dindafika',
+      icon: 'Github',
+      label: 'github.com/dindafika',
+    },
+    {
+      platform: 'LinkedIn',
+      url: 'https://linkedin.com/in/dindafika',
+      icon: 'Linkedin',
+      label: 'linkedin.com/in/dindafika',
+    },
+    {
+      platform: 'Instagram',
+      url: 'https://instagram.com/dindafika.dev',
+      icon: 'Instagram',
+      label: '@dindafika.dev',
+    },
+    {
+      platform: 'WhatsApp',
+      url: 'https://wa.me/6281234567890',
+      icon: 'MessageCircle',
+      label: '+62 812-3456-7890',
+    },
+    {
+      platform: 'Email',
+      url: 'mailto:dindafika686@gmail.com',
+      icon: 'Mail',
+      label: 'dindafika686@gmail.com',
+    },
+  ],
 };
 
 export const navItems: NavItem[] = [

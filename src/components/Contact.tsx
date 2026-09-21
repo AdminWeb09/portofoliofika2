@@ -12,8 +12,11 @@ import {
   AlertCircle,
   MessageSquare,
   Sparkles,
+  Phone,
+  Globe,
+  MessageCircle,
+  Link2,
 } from 'lucide-react';
-import { socialLinks } from '../data/portfolioData.ts';
 import { usePortfolio } from '../context/PortfolioContext.tsx';
 import { ContactFormData } from '../types.ts';
 
@@ -22,7 +25,7 @@ interface ContactProps {
 }
 
 export const Contact: React.FC<ContactProps> = ({ isDark }) => {
-  const { personalInfo, addMessage } = usePortfolio();
+  const { personalInfo, addMessage, socialLinks } = usePortfolio();
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
@@ -107,16 +110,14 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
   };
 
   const getSocialIcon = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case 'github':
-        return <Github className="w-4 h-4" />;
-      case 'linkedin':
-        return <Linkedin className="w-4 h-4" />;
-      case 'instagram':
-        return <Instagram className="w-4 h-4" />;
-      default:
-        return <Mail className="w-4 h-4" />;
-    }
+    const p = platform.toLowerCase();
+    if (p.includes('git')) return <Github className="w-4 h-4" />;
+    if (p.includes('link')) return <Linkedin className="w-4 h-4" />;
+    if (p.includes('insta')) return <Instagram className="w-4 h-4" />;
+    if (p.includes('whats') || p.includes('wa')) return <MessageCircle className="w-4 h-4" />;
+    if (p.includes('web') || p.includes('site') || p.includes('blog')) return <Globe className="w-4 h-4" />;
+    if (p.includes('mail')) return <Mail className="w-4 h-4" />;
+    return <Link2 className="w-4 h-4" />;
   };
 
   return (
@@ -188,6 +189,31 @@ export const Contact: React.FC<ContactProps> = ({ isDark }) => {
                     </p>
                   </div>
                 </a>
+
+                {/* Phone / WhatsApp if provided */}
+                {personalInfo.phone && (
+                  <a
+                    id="contact-direct-phone"
+                    href={personalInfo.whatsappUrl || `https://wa.me/${personalInfo.phone.replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-start gap-4 p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${
+                      isDark
+                        ? 'bg-slate-800/70 border-slate-700/80 hover:bg-slate-800 hover:border-emerald-500/40 text-slate-200'
+                        : 'bg-white border-slate-200 hover:border-emerald-300 hover:shadow-sm text-slate-800'
+                    }`}
+                  >
+                    <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-500 shrink-0">
+                      <Phone className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-slate-400">Telepon / WhatsApp</h4>
+                      <p className="text-sm font-semibold mt-0.5 hover:text-emerald-500 transition-colors">
+                        {personalInfo.phone}
+                      </p>
+                    </div>
+                  </a>
+                )}
 
                 {/* Location */}
                 <div

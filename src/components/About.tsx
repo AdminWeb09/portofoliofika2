@@ -68,8 +68,8 @@ export const About: React.FC<AboutProps> = ({ isDark }) => {
                 isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'
               }`}>
                 <img
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80"
-                  alt="Tentang Dinda Fika"
+                  src={personalInfo.aboutImageUrl || personalInfo.avatarUrl || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80'}
+                  alt={`Tentang ${personalInfo.name}`}
                   referrerPolicy="no-referrer"
                   className="w-full h-80 sm:h-96 object-cover object-top"
                 />

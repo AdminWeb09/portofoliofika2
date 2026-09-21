@@ -1,6 +1,18 @@
 import React from 'react';
-import { ArrowUp, Sparkles, Heart, Github, Linkedin, Instagram, Mail, Lock } from 'lucide-react';
-import { navItems, socialLinks } from '../data/portfolioData.ts';
+import {
+  ArrowUp,
+  Sparkles,
+  Heart,
+  Github,
+  Linkedin,
+  Instagram,
+  Mail,
+  Lock,
+  Globe,
+  MessageCircle,
+  Link2,
+} from 'lucide-react';
+import { navItems } from '../data/portfolioData.ts';
 import { usePortfolio } from '../context/PortfolioContext.tsx';
 
 interface FooterProps {
@@ -8,7 +20,7 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ isDark }) => {
-  const { personalInfo } = usePortfolio();
+  const { personalInfo, socialLinks } = usePortfolio();
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -32,16 +44,14 @@ export const Footer: React.FC<FooterProps> = ({ isDark }) => {
   };
 
   const getSocialIcon = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case 'github':
-        return <Github className="w-4 h-4" />;
-      case 'linkedin':
-        return <Linkedin className="w-4 h-4" />;
-      case 'instagram':
-        return <Instagram className="w-4 h-4" />;
-      default:
-        return <Mail className="w-4 h-4" />;
-    }
+    const p = platform.toLowerCase();
+    if (p.includes('git')) return <Github className="w-4 h-4" />;
+    if (p.includes('link')) return <Linkedin className="w-4 h-4" />;
+    if (p.includes('insta')) return <Instagram className="w-4 h-4" />;
+    if (p.includes('whats') || p.includes('wa')) return <MessageCircle className="w-4 h-4" />;
+    if (p.includes('web') || p.includes('site') || p.includes('blog')) return <Globe className="w-4 h-4" />;
+    if (p.includes('mail')) return <Mail className="w-4 h-4" />;
+    return <Link2 className="w-4 h-4" />;
   };
 
   return (

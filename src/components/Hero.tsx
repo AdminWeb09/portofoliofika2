@@ -1,7 +1,21 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, Send, Download, Github, Linkedin, Instagram, Mail, Sparkles, Code2, Layers, ChevronDown } from 'lucide-react';
-import { socialLinks } from '../data/portfolioData.ts';
+import {
+  ArrowRight,
+  Send,
+  Download,
+  Github,
+  Linkedin,
+  Instagram,
+  Mail,
+  Sparkles,
+  Code2,
+  Layers,
+  ChevronDown,
+  Globe,
+  MessageCircle,
+  Link2,
+} from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext.tsx';
 
 interface HeroProps {
@@ -9,7 +23,7 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ isDark }) => {
-  const { personalInfo } = usePortfolio();
+  const { personalInfo, socialLinks } = usePortfolio();
   const handleScrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
@@ -18,6 +32,17 @@ export const Hero: React.FC<HeroProps> = ({ isDark }) => {
       const offsetPosition = elementPosition + window.pageYOffset - navHeight;
       window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
     }
+  };
+
+  const getSocialIcon = (platform: string) => {
+    const p = platform.toLowerCase();
+    if (p.includes('git')) return <Github className="w-4 h-4" />;
+    if (p.includes('link')) return <Linkedin className="w-4 h-4" />;
+    if (p.includes('insta')) return <Instagram className="w-4 h-4" />;
+    if (p.includes('whats') || p.includes('wa')) return <MessageCircle className="w-4 h-4" />;
+    if (p.includes('web') || p.includes('site') || p.includes('blog')) return <Globe className="w-4 h-4" />;
+    if (p.includes('mail')) return <Mail className="w-4 h-4" />;
+    return <Link2 className="w-4 h-4" />;
   };
 
   return (
@@ -128,22 +153,39 @@ export const Hero: React.FC<HeroProps> = ({ isDark }) => {
                 <Send className="w-4 h-4 text-indigo-500" />
               </button>
 
-              <a
-                id="hero-cta-cv"
-                href="#about"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleScrollTo('about');
-                }}
-                className={`inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-sm font-medium transition-colors ${
-                  isDark
-                    ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/60'
-                }`}
-              >
-                <Download className="w-4 h-4" />
-                <span>Ringkasan Bio</span>
-              </a>
+              {personalInfo.cvUrl && personalInfo.cvUrl.startsWith('http') ? (
+                <a
+                  id="hero-cta-cv"
+                  href={personalInfo.cvUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-sm font-medium transition-colors ${
+                    isDark
+                      ? 'text-slate-300 hover:text-white hover:bg-slate-800/80 border border-slate-700/60'
+                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 shadow-xs'
+                  }`}
+                >
+                  <Download className="w-4 h-4 text-indigo-500" />
+                  <span>Lihat CV / Resume</span>
+                </a>
+              ) : (
+                <a
+                  id="hero-cta-cv"
+                  href="#about"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleScrollTo('about');
+                  }}
+                  className={`inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-sm font-medium transition-colors ${
+                    isDark
+                      ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/60'
+                  }`}
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Ringkasan Bio</span>
+                </a>
+              )}
             </div>
 
             {/* Quick Social Media Icons */}
@@ -153,39 +195,24 @@ export const Hero: React.FC<HeroProps> = ({ isDark }) => {
               }`}>
                 Terhubung:
               </span>
-              <div className="flex items-center gap-2">
-                {socialLinks.map((social) => {
-                  const getIcon = (platform: string) => {
-                    switch (platform.toLowerCase()) {
-                      case 'github':
-                        return <Github className="w-4 h-4" />;
-                      case 'linkedin':
-                        return <Linkedin className="w-4 h-4" />;
-                      case 'instagram':
-                        return <Instagram className="w-4 h-4" />;
-                      default:
-                        return <Mail className="w-4 h-4" />;
-                    }
-                  };
-
-                  return (
-                    <a
-                      key={social.platform}
-                      id={`hero-social-${social.platform.toLowerCase()}`}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`Kunjungi profil ${social.platform}`}
-                      className={`p-2 rounded-lg border transition-all duration-200 hover:scale-110 ${
-                        isDark
-                          ? 'border-slate-800 bg-slate-800/60 text-slate-400 hover:text-indigo-400 hover:border-indigo-500/40'
-                          : 'border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm'
-                      }`}
-                    >
-                      {getIcon(social.platform)}
-                    </a>
-                  );
-                })}
+              <div className="flex items-center gap-2 flex-wrap">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.platform}
+                    id={`hero-social-${social.platform.toLowerCase()}`}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Kunjungi profil ${social.platform}`}
+                    className={`p-2 rounded-lg border transition-all duration-200 hover:scale-110 ${
+                      isDark
+                        ? 'border-slate-800 bg-slate-800/60 text-slate-400 hover:text-indigo-400 hover:border-indigo-500/40'
+                        : 'border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm'
+                    }`}
+                  >
+                    {getSocialIcon(social.platform)}
+                  </a>
+                ))}
               </div>
             </div>
           </motion.div>
@@ -210,7 +237,7 @@ export const Hero: React.FC<HeroProps> = ({ isDark }) => {
                 isDark ? 'bg-slate-800/90 border-slate-700/80' : 'bg-white border-slate-200'
               }`}>
                 <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"
+                  src={personalInfo.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80'}
                   alt={`Potret ${personalInfo.name}`}
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover rounded-2xl filter contrast-105"
